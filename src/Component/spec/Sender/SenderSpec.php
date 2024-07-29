@@ -21,21 +21,27 @@ use Sylius\Component\Mailer\Provider\DefaultSettingsProviderInterface;
 use Sylius\Component\Mailer\Provider\EmailProviderInterface;
 use Sylius\Component\Mailer\Renderer\Adapter\AdapterInterface as RendererAdapterInterface;
 use Sylius\Component\Mailer\Renderer\RenderedEmail;
-use Sylius\Component\Mailer\Sender\Adapter\AdapterInterface as SenderAdapterInterface;;
-use Sylius\Component\Mailer\Sender\Adapter\CcAwareAdapterInterface as CcAwareSenderAdapterInterface;;
+use Sylius\Component\Mailer\Sender\Adapter\AdapterInterface as SenderAdapterInterface;
+use Sylius\Component\Mailer\Sender\Adapter\CcAwareAdapterInterface as CcAwareSenderAdapterInterface;
 
 final class SenderSpec extends ObjectBehavior
 {
-    function it_sends_an_email_through_the_adapter(
+    function let(
         RendererAdapterInterface $rendererAdapter,
         SenderAdapterInterface $senderAdapter,
         EmailProviderInterface $provider,
         DefaultSettingsProviderInterface $defaultSettingsProvider,
+    ): void {
+        $this->beConstructedWith($rendererAdapter, $senderAdapter, $provider, $defaultSettingsProvider);
+    }
+
+    function it_sends_an_email_through_the_adapter(
+        RendererAdapterInterface $rendererAdapter,
+        SenderAdapterInterface $senderAdapter,
+        EmailProviderInterface $provider,
         EmailInterface $email,
         RenderedEmail $renderedEmail,
     ): void {
-        $this->beConstructedWith($rendererAdapter, $senderAdapter, $provider, $defaultSettingsProvider);
-
         $provider->getEmail('bar')->willReturn($email);
         $email->isEnabled()->willReturn(true);
         $email->getSenderAddress()->willReturn('sender@example.com');
@@ -63,12 +69,9 @@ final class SenderSpec extends ObjectBehavior
         RendererAdapterInterface $rendererAdapter,
         CcAwareSenderAdapterInterface $senderAdapter,
         EmailProviderInterface $provider,
-        DefaultSettingsProviderInterface $defaultSettingsProvider,
         EmailInterface $email,
         RenderedEmail $renderedEmail,
     ): void {
-        $this->beConstructedWith($rendererAdapter, $senderAdapter, $provider, $defaultSettingsProvider);
-
         $provider->getEmail('bar')->willReturn($email);
         $email->isEnabled()->willReturn(true);
         $email->getSenderAddress()->willReturn('sender@example.com');
@@ -99,7 +102,7 @@ final class SenderSpec extends ObjectBehavior
         EmailProviderInterface $provider,
         RenderedEmail $renderedEmail,
         RendererAdapterInterface $rendererAdapter,
-        SenderAdapterInterface $senderAdapter,
+        CcAwareSenderAdapterInterface $senderAdapter,
         DefaultSettingsProviderInterface $defaultSettingsProvider,
         EmailModifierInterface $emailModifier,
     ): void {
@@ -136,11 +139,8 @@ final class SenderSpec extends ObjectBehavior
         RendererAdapterInterface $rendererAdapter,
         SenderAdapterInterface $senderAdapter,
         EmailProviderInterface $provider,
-        DefaultSettingsProviderInterface $defaultSettingsProvider,
         EmailInterface $email,
     ): void {
-        $this->beConstructedWith($rendererAdapter, $senderAdapter, $provider, $defaultSettingsProvider);
-
         $provider->getEmail('bar')->willReturn($email);
         $email->isEnabled()->willReturn(false);
 
@@ -153,11 +153,7 @@ final class SenderSpec extends ObjectBehavior
     function it_throws_an_exception_if_wrong_value_is_provided_as_recipient_email(
         RendererAdapterInterface $rendererAdapter,
         SenderAdapterInterface $senderAdapter,
-        EmailProviderInterface $provider,
-        DefaultSettingsProviderInterface $defaultSettingsProvider,
     ): void {
-        $this->beConstructedWith($rendererAdapter, $senderAdapter, $provider, $defaultSettingsProvider);
-
         $rendererAdapter->render(Argument::any())->shouldNotBeCalled();
         $senderAdapter->send(Argument::any())->shouldNotBeCalled();
 
